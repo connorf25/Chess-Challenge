@@ -8,17 +8,30 @@ public class MyBot : IChessBot
     public Move Think(Board board, Timer timer)
     {
         Move bestMove = Move.NullMove;
-        int bestValue = int.MinValue;
+        // White wants to maximise score, while black wants to minimise
+        int bestValue = (board.IsWhiteToMove) ? int.MinValue : int.MaxValue;
 
         var legalMoves = board.GetLegalMoves(capturesOnly: false);
 
         foreach (var move in legalMoves)
         {
             board.MakeMove(move);
-            int moveValue = -Minimax(board, MAX_DEPTH - 1, int.MinValue, int.MaxValue, false);
+            int moveValue;
+
+            // If it's the bot's turn to play as white, then maximize; otherwise, minimize
+            if (board.IsWhiteToMove)
+            {
+                moveValue = Minimax(board, MAX_DEPTH - 1, int.MinValue, int.MaxValue, true);
+            }
+            else
+            {
+                moveValue = Minimax(board, MAX_DEPTH - 1, int.MinValue, int.MaxValue, false);
+            }
+
             board.UndoMove(move);
 
-            if (moveValue > bestValue)
+            if ((board.IsWhiteToMove && moveValue > bestValue) ||
+                (!board.IsWhiteToMove && moveValue < bestValue))
             {
                 bestValue = moveValue;
                 bestMove = move;
@@ -28,50 +41,61 @@ public class MyBot : IChessBot
         return bestMove;
     }
 
-    private int Minimax(Board board, int depth, int alpha, int beta, bool maximizingPlayer)
+    int Minimax(Board board, int depth, int alpha, int beta, bool isMaximizing)
     {
-        if (depth == 0 || board.IsInCheckmate() || board.IsInStalemate())
+        if (depth == 0)
         {
             return EvaluateBoard(board);
         }
 
-        var legalMoves = board.GetLegalMoves(capturesOnly: false);
-
-        if (maximizingPlayer)
+        if (isMaximizing)
         {
             int maxEval = int.MinValue;
+            var legalMoves = board.GetLegalMoves();
             foreach (var move in legalMoves)
             {
                 board.MakeMove(move);
-                int eval = -Minimax(board, depth - 1, -beta, -alpha, false);
+                int eval = Minimax(board, depth - 1, alpha, beta, !isMaximizing);
                 board.UndoMove(move);
                 maxEval = Math.Max(maxEval, eval);
                 alpha = Math.Max(alpha, eval);
                 if (beta <= alpha)
+                {
                     break;
+                }
             }
             return maxEval;
         }
         else
         {
             int minEval = int.MaxValue;
+            var legalMoves = board.GetLegalMoves();
             foreach (var move in legalMoves)
             {
                 board.MakeMove(move);
-                int eval = -Minimax(board, depth - 1, -beta, -alpha, true);
+                int eval = Minimax(board, depth - 1, alpha, beta, !isMaximizing);
                 board.UndoMove(move);
-                minEval = Math.Min(minEval, eval);
+                if (eval < minEval)
+                {
+                    minEval = eval;
+                }
                 beta = Math.Min(beta, eval);
                 if (beta <= alpha)
+                {
                     break;
+                }
             }
             return minEval;
         }
     }
 
+    /**
+     * Determine who the board state favours
+     * This function counts pieces to determine who is winning
+     * A positive value favours white, while a negative value favours black
+     */
     private int EvaluateBoard(Board board)
     {
-        // Count pieces to evaluate position
         int value = 0;
 
         for (int pieceTypeInt = 1; pieceTypeInt <= 6; pieceTypeInt++)
@@ -95,12 +119,10 @@ public class MyBot : IChessBot
                 case PieceType.Queen:
                     value += (whitePieces.Count - blackPieces.Count) * 9;
                     break;
-                case PieceType.King:
-                    value += (whitePieces.Count - blackPieces.Count) * 900;
-                    break;
+                    // No king yet
             }
-        }
 
+        }
         return value;
     }
 }
