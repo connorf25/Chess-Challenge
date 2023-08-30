@@ -98,6 +98,19 @@ public class MyBot : IChessBot
     {
         int value = 0;
 
+        // Check checkmate
+        if (board.IsInCheckmate())
+        {
+            return board.IsWhiteToMove ? float.MaxValue : float.MinValue;
+        }
+
+        // Reward checks
+        if (board.IsInCheck())
+        {
+            value += board.IsWhiteToMove ? 10 : -10;
+        }
+
+        // If no checkmate evaluate other pieces
         for (int pieceTypeInt = 1; pieceTypeInt <= 6; pieceTypeInt++)
         {
             var pieceType = (PieceType)pieceTypeInt;
