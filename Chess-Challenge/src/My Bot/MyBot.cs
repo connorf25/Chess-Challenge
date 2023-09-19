@@ -21,22 +21,11 @@ public class MyBot : IChessBot
         foreach (var move in legalMoves)
         {
             board.MakeMove(move);
-            double moveValue;
-
-            // If it's the bot's turn to play as white, then maximize; otherwise, minimize
-            if (board.IsWhiteToMove)
-            {
-                moveValue = Minimax(board, MAX_DEPTH - 1, double.MinValue, double.MaxValue, true);
-            }
-            else
-            {
-                moveValue = Minimax(board, MAX_DEPTH - 1, double.MinValue, double.MaxValue, false);
-            }
-
+            // Maximise for white, minimise for black
+            double moveValue = Minimax(board, MAX_DEPTH - 1, double.MinValue, double.MaxValue, board.IsWhiteToMove);
             board.UndoMove(move);
 
-            if ((board.IsWhiteToMove && moveValue > bestValue) ||
-                (!board.IsWhiteToMove && moveValue < bestValue))
+            if (board.IsWhiteToMove ? moveValue > bestValue : moveValue < bestValue)
             {
                 bestValue = moveValue;
                 bestMove = move;
