@@ -187,7 +187,7 @@ public class MyBot : IChessBot
         // Check checkmate
         if (board.IsInCheckmate())
         {
-            return board.IsWhiteToMove ? double.MaxValue : double.MinValue;
+            return board.IsWhiteToMove ? 99999 : -99999;
         }
 
         // Reward checks
