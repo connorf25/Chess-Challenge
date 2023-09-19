@@ -153,6 +153,12 @@ public class MyBot : IChessBot
             return board.IsWhiteToMove ? 99999 : -99999;
         }
 
+        // Check draw
+        if (board.IsDraw())
+        {
+            return 0;
+        }
+
         // Reward checks
         if (board.IsInCheck())
         {
