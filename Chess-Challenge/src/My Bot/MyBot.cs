@@ -123,7 +123,7 @@ public class MyBot : IChessBot
             -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0,
             -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0
         },
-        // TODO: Look into king
+        // No room for king
     };
 
     // Store reverse arrays for black
