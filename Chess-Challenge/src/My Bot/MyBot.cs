@@ -163,6 +163,18 @@ public class MyBot : IChessBot
         // TODO: Look into king
     };
 
+    // Store reverse arrays for black
+    private static double[][] pieceEvalBlack;
+    static MyBot()
+    {
+        pieceEvalBlack = new double[pieceEvalWhite.Length][];
+        for (int i = 0; i < pieceEvalWhite.Length; i++)
+        {
+            pieceEvalBlack[i] = (double[])pieceEvalWhite[i].Clone();
+            Array.Reverse(pieceEvalBlack[i]);
+        }
+    }
+
     /**
      * Determine who the board state favours
      * This function counts pieces to determine who is winning
@@ -195,16 +207,8 @@ public class MyBot : IChessBot
                 - board.GetPieceList(pieceType, false).Count;
 
             // Positional evaluation array
-            var evalArrayWhite = pieceEvalWhite[pieceTypeInt - 1];
-            var evalArrayBlack = (double[])evalArrayWhite.Clone();
-            Array.Reverse(evalArrayBlack);
-
-            // Calculate new score using position
-            var pieceEvalScore =
-                // White pieces
-                EvaluateBitboard(board.GetPieceBitboard(pieceType, true), evalArrayWhite)
-                // Black pieces
-                - EvaluateBitboard(board.GetPieceBitboard(pieceType, false), evalArrayBlack);
+            var pieceEvalScore = EvaluateBitboard(board.GetPieceBitboard(pieceType, true), pieceEvalWhite[pieceTypeInt - 1])
+                               - EvaluateBitboard(board.GetPieceBitboard(pieceType, false), pieceEvalBlack[pieceTypeInt - 1]);
 
             // Multipy by number of pieces for each side
             switch (pieceTypeInt)
