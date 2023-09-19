@@ -51,50 +51,24 @@ public class MyBot : IChessBot
      */
     double Minimax(Board board, int depth, double alpha, double beta, bool isMaximizing)
     {
-        if (depth == 0)
-        {
-            return EvaluateBoard(board);
-        }
+        if (depth == 0) return EvaluateBoard(board);
 
-        if (isMaximizing)
+        double bestValue = isMaximizing ? double.MinValue : double.MaxValue;
+        var legalMoves = board.GetLegalMoves();
+        foreach (var move in legalMoves)
         {
-            double maxEval = double.MinValue;
-            var legalMoves = board.GetLegalMoves();
-            foreach (var move in legalMoves)
-            {
-                board.MakeMove(move);
-                double eval = Minimax(board, depth - 1, alpha, beta, !isMaximizing);
-                board.UndoMove(move);
-                maxEval = Math.Max(maxEval, eval);
-                alpha = Math.Max(alpha, eval);
-                if (beta <= alpha)
-                {
-                    break;
-                }
-            }
-            return maxEval;
+            board.MakeMove(move);
+            double eval = Minimax(board, depth - 1, alpha, beta, !isMaximizing);
+            board.UndoMove(move);
+
+            bestValue = isMaximizing ? Math.Max(bestValue, eval) : Math.Min(bestValue, eval);
+
+            if (isMaximizing) alpha = Math.Max(alpha, eval);
+            else beta = Math.Min(beta, eval);
+
+            if (beta <= alpha) break;
         }
-        else
-        {
-            double minEval = double.MaxValue;
-            var legalMoves = board.GetLegalMoves();
-            foreach (var move in legalMoves)
-            {
-                board.MakeMove(move);
-                double eval = Minimax(board, depth - 1, alpha, beta, !isMaximizing);
-                board.UndoMove(move);
-                if (eval < minEval)
-                {
-                    minEval = eval;
-                }
-                beta = Math.Min(beta, eval);
-                if (beta <= alpha)
-                {
-                    break;
-                }
-            }
-            return minEval;
-        }
+        return bestValue;
     }
 
     // Array to hold the board evals for certain positions as white
