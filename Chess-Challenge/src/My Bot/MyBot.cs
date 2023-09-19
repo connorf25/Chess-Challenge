@@ -148,22 +148,13 @@ public class MyBot : IChessBot
         double value = 0;
 
         // Check checkmate
-        if (board.IsInCheckmate())
-        {
-            return board.IsWhiteToMove ? 99999 : -99999;
-        }
+        if (board.IsInCheckmate()) return board.IsWhiteToMove ? 99999 : -99999;
 
         // Check draw
-        if (board.IsDraw())
-        {
-            return 0;
-        }
+        if (board.IsDraw()) return 0;
 
         // Reward checks
-        if (board.IsInCheck())
-        {
-            value += board.IsWhiteToMove ? 10 : -10;
-        }
+        if (board.IsInCheck()) value += board.IsWhiteToMove ? 10 : -10;
 
         // If no checkmate evaluate other pieces
         for (int pieceTypeInt = 1; pieceTypeInt < 6; pieceTypeInt++)
