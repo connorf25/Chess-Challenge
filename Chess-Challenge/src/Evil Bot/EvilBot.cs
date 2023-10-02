@@ -3,6 +3,7 @@ using System.Numerics;
 using ChessChallenge.API;
 
 namespace ChessChallenge.Example;
+
 public class EvilBot : IChessBot
 {
     // How deep to search with minmax
@@ -105,11 +106,11 @@ public class EvilBot : IChessBot
         {
             0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
             0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,
-            0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
-            0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
-            0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
-            0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
-            0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+            -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+            -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+            -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+            -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+            -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
             0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0
         },
         // Queen
@@ -124,7 +125,7 @@ public class EvilBot : IChessBot
             -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0,
             -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0
         },
-        // TODO: Look into king
+        // No room for king
     };
 
     // Store reverse arrays for black
@@ -149,16 +150,13 @@ public class EvilBot : IChessBot
         double value = 0;
 
         // Check checkmate
-        if (board.IsInCheckmate())
-        {
-            return board.IsWhiteToMove ? 99999 : -99999;
-        }
+        if (board.IsInCheckmate()) return board.IsWhiteToMove ? 99999 : -99999;
+
+        // Check draw
+        if (board.IsDraw()) return 0;
 
         // Reward checks
-        if (board.IsInCheck())
-        {
-            value += board.IsWhiteToMove ? 10 : -10;
-        }
+        if (board.IsInCheck()) value += board.IsWhiteToMove ? 10 : -10;
 
         // If no checkmate evaluate other pieces
         for (int pieceTypeInt = 1; pieceTypeInt < 6; pieceTypeInt++)

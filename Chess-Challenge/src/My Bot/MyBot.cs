@@ -4,14 +4,25 @@ using ChessChallenge.API;
 
 public class MyBot : IChessBot
 {
-    // How deep to search with minmax
-    private const int MAX_DEPTH = 4;
-
     /**
      * Main function to calculate next best move
      */
     public Move Think(Board board, Timer timer)
     {
+        // Max depth of search
+        int maxDepth = 3; // Default less than 5 seconds left
+        long timeRemaining = timer.MillisecondsRemaining;
+
+        if (timeRemaining > 20000) 
+        {
+            maxDepth = 5; // More than 20 seconds
+        }
+        else if (timeRemaining > 5000)
+        {
+            maxDepth = 4; // Between 5 and 20 seconds
+        }
+
+        // Placeholder for best move
         Move bestMove = Move.NullMove;
         // White wants to maximise score, while black wants to minimise
         double bestValue = (board.IsWhiteToMove) ? double.MinValue : double.MaxValue;
@@ -22,7 +33,7 @@ public class MyBot : IChessBot
         {
             board.MakeMove(move);
             // Maximise for white, minimise for black
-            double moveValue = Minimax(board, MAX_DEPTH - 1, double.MinValue, double.MaxValue, board.IsWhiteToMove);
+            double moveValue = Minimax(board, maxDepth - 1, double.MinValue, double.MaxValue, board.IsWhiteToMove);
             board.UndoMove(move);
 
             if (board.IsWhiteToMove ? moveValue > bestValue : moveValue < bestValue)
